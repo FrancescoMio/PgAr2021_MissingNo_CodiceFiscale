@@ -11,6 +11,8 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+
+
 /**
  * @author FRANCESCO MIO
  *
@@ -44,8 +46,7 @@ public class calcolatore {
 		return annoNascita;
 	}
 	
-	public static void creaPersone(ArrayList<Persona> persone) throws XMLStreamException {
-		String filename = "src/XML/inputPersone.xml";
+	public static XMLStreamReader creaLettore(String filename) { //crea un Lettore xmlr
 		XMLInputFactory xmlif = null;
 		XMLStreamReader xmlr = null;
 		try {
@@ -54,7 +55,14 @@ public class calcolatore {
 		} catch (Exception e) {
 		 System.out.println("Errore nell'inizializzazione del reader:");
 		 System.out.println(e.getMessage());
+		 return null;
 		}
+		return xmlr;
+	}
+	
+	public static void creaPersone(ArrayList<Persona> persone) throws XMLStreamException {
+		
+		XMLStreamReader xmlr = creaLettore("CodiceFiscale/src/XML/inputPersone.xml");
 		while (xmlr.hasNext()) { // continua a leggere finché ha eventi a disposizione
 			 switch (xmlr.getEventType()) {
 			 case XMLStreamConstants.START_ELEMENT:
@@ -78,7 +86,7 @@ public class calcolatore {
 						 sesso = xmlr.getText().charAt(0);
 					 }
 					 else if(elementName.equals("comune_nascita")) {
-						 comuneNascita = xmlr.getText();
+						 comuneNascita=trovaComune(xmlr.getText());
 					 }
 					 else {
 						 giornoNascita = calcolatore.calcolaGiornoNascita(xmlr.getText());
@@ -91,5 +99,63 @@ public class calcolatore {
 			 xmlr.next();
 		}
 	}
-
+	
+	private static String trovaComune(String comuneNascita ) throws XMLStreamException { //trova codice relativo al comune
+		XMLStreamReader xmlr = creaLettore("CodiceFiscale/src/XML/comuni.xml");
+		boolean check=false;
+		 while (xmlr.hasNext()) { // continua a leggere finché ha eventi a disposizione
+			 switch (xmlr.getEventType()) {
+			 case XMLStreamConstants.START_ELEMENT:
+				 if (xmlr.getLocalName().equals("codice")&&check) {
+					 xmlr.next();
+					 return xmlr.getText();
+				 }
+				 break;
+			 case XMLStreamConstants.CHARACTERS:
+			 		if (xmlr.getText().trim().length() > 0){
+			 			if(xmlr.getText().equals(comuneNascita)) {
+			 				check=true;
+					 	}
+			 		}
+			 		break;
+			 }
+			 xmlr.next();
+		 }
+		 return "";
+	}
+	
+	/*public static String generazioneCodiceFiscale(Persona persone) {
+		String Vocali = "AEIOUaeiou";
+		String CodiceFiscale= "";
+		int contatore=0;
+		
+		for (int i=0;i< persone.getCognome().length()-1; i++) {
+			String lettera= String.valueOf(persone.getCognome().charAt(i));
+			if (!Vocali.contains(lettera)){
+				CodiceFiscale = CodiceFiscale.concat(lettera);
+				contatore++;
+				}
+		}
+		
+		if (contatore !=3) {
+			for (int i=0;i< persone.getCognome().length()-1; i++) {
+				String lettera2= String.valueOf(persone.getCognome().charAt(i));
+				if (Vocali.contains(lettera2)){
+					CodiceFiscale = CodiceFiscale.concat(lettera2);
+					contatore++;
+					}
+			}
+		}
+			
+		if (contatore !=3){
+			while(contatore!=3) {
+				CodiceFiscale = CodiceFiscale.concat("X");
+				contatore++;
+			}
+		}
+		
+		return CodiceFiscale;
+	}*/
+	
+	
 }
