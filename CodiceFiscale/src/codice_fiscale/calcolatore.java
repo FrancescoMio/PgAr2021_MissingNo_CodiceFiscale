@@ -149,7 +149,7 @@ public class calcolatore {
 			codiceFiscale=codiceFiscale.concat(String.valueOf(vocali.charAt(i)));
 		}
 		while(codiceFiscale.length()<3) {
-			codiceFiscale=codiceFiscale.concat("x");
+			codiceFiscale=codiceFiscale.concat("X");
 			}
 		
 		//Nome
@@ -233,7 +233,7 @@ public class calcolatore {
 		if (persone.getSesso()=='F')
 			codiceFiscale=codiceFiscale.concat(String.valueOf(persone.getGiornoNascita()+40));
 		else {
-			if (persone.getGiornoNascita()<9)
+			if (persone.getGiornoNascita()<10)
 			codiceFiscale=  codiceFiscale.concat("0" + String.valueOf(persone.getGiornoNascita()));
 			else
 			codiceFiscale=codiceFiscale.concat(String.valueOf(persone.getGiornoNascita()));
@@ -244,7 +244,19 @@ public class calcolatore {
 		
 		//Questo è per te ;)
 		
-		return codiceFiscale;
+		if (codiceFiscale.length()==15) {
+			ArrayList<Character> charPari = new ArrayList<Character>();
+			ArrayList<Character> charDispari = new ArrayList<Character>();
+			for (int i=0; i<codiceFiscale.length();i++) {
+				if (i%2==0) 
+					charDispari.add(codiceFiscale.charAt(i));
+				else 
+					charPari.add(codiceFiscale.charAt(i));
+			}
+			
+			System.out.println(charPari);
+			System.out.println(charDispari);
 		}
-		
+		return codiceFiscale;
 	}
+}

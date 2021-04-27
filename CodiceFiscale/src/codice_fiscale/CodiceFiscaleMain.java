@@ -10,7 +10,7 @@ public class CodiceFiscaleMain {
 	
 	public static void main(String[] args) throws XMLStreamException {
 		calcolatore.creaPersone(persone);
-		for(int i = 0; i < 40; i++) {
+		for(int i = 0; i < 5; i++) {
 			System.out.println(persone.get(i).toString());
 			System.out.println(calcolatore.generazioneCodiceFiscale(persone.get(i)));
 			
