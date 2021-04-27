@@ -74,6 +74,11 @@ public class calcolatore {
 				 Persona persona = new Persona(nome, cognome, comuneNascita, sesso, giornoNascita, meseNascita, annoNascita);
 				 persona.setComuneCodice(comuneCodice);
 				 persona.setCodiceFiscale(calcolatore.generazioneCodiceFiscale(persona));
+				 if (!esisteCodice(persona))
+					 persona.setAssenza("ASSENTE");
+				else
+					persona.setAssenza(persona.getCodiceFiscale());
+						 
 				 persone.add(persona);
 				 } 
 				 break; 
@@ -140,9 +145,10 @@ public class calcolatore {
 			String lettera= String.valueOf(persone.getCognome().charAt(i));
 			if (!vocaliGlobali.contains(lettera)) 
 				consonanti =consonanti.concat(lettera);
-			
-			else
+			else if (vocaliGlobali.contains(lettera))
 				vocali = vocali.concat(lettera);
+			else
+				return "ERROR";
 				
 		}
 		for (int i=0; i<consonanti.length()&&codiceFiscale.length()<3;i++) {
@@ -162,10 +168,10 @@ public class calcolatore {
 			String lettera= String.valueOf(persone.getNome().charAt(i));
 			if (!vocaliGlobali.contains(lettera)) 
 				consonanti =consonanti.concat(lettera);
-			
-			else
+			else if (vocaliGlobali.contains(lettera))
 				vocali = vocali.concat(lettera);
-				
+			else
+				return "ERROR";
 		}
 		
 		if (consonanti.length()>3) {
@@ -191,6 +197,7 @@ public class calcolatore {
 			anno = "0"+anno;
 		}
 		codiceFiscale= codiceFiscale.concat(anno);
+		
 		//Mese di nascita
 		String mese="";
 		switch (persone.getMeseNascita()) {
@@ -230,9 +237,27 @@ public class calcolatore {
 		case 12:
 			mese="T";
 			break;
+		default:
+			return "ERROR";
 			}
 		codiceFiscale= codiceFiscale.concat(mese);
+		
 		//Giorno di nascita
+		if (persone.getMeseNascita()==1 || persone.getMeseNascita()==3 || persone.getMeseNascita()==5 || persone.getMeseNascita()==7 || persone.getMeseNascita()==8 || persone.getMeseNascita()==10 || persone.getMeseNascita()==12) {
+			if (persone.getGiornoNascita()>31)
+				return "ERROR";
+		}
+		
+		if (persone.getMeseNascita()==4 || persone.getMeseNascita()==6 || persone.getMeseNascita()==4 || persone.getMeseNascita()==9 || persone.getMeseNascita()==11) {
+			if (persone.getGiornoNascita()>30)
+				return "ERROR";
+		}
+		
+		if (persone.getMeseNascita()==2) {
+			if (persone.getGiornoNascita()>28)
+				return "ERROR";
+		}
+				
 		if (persone.getSesso()=='F')
 			codiceFiscale=codiceFiscale.concat(String.valueOf(persone.getGiornoNascita()+40));
 		else {
@@ -244,9 +269,6 @@ public class calcolatore {
 		//Comune di nascita
 		codiceFiscale= codiceFiscale.concat(persone.getComuneCodice());
 		//Carattere di Controllo
-		
-		//Questo è per te ;)
-		
 		if (codiceFiscale.length() == 15) {
 			ArrayList<Character> charPari = new ArrayList<Character>();
 			ArrayList<Character> charDispari = new ArrayList<Character>();
@@ -284,8 +306,31 @@ public class calcolatore {
 			int ascii = resto + 65;
 			cin = ((char)ascii);
 			codiceFiscale = codiceFiscale.concat(String.valueOf(cin));
+			return codiceFiscale;
 		}
+		else
+			return "ERROR";
 		
-		return codiceFiscale;
+		
+	}
+	
+	public static Boolean esisteCodice(Persona persone) throws XMLStreamException {
+		if (persone.getCodiceFiscale().equals("ERROR")) {
+			return false;
+		}
+		XMLStreamReader xmlr = creaLettore("CodiceFiscale/src/XML/codiciFiscali.xml");
+		while (xmlr.hasNext()) { // continua a leggere finché ha eventi a disposizione
+			 switch (xmlr.getEventType()) {
+			 case XMLStreamConstants.CHARACTERS:
+			 		if (xmlr.getText().trim().length() > 0){
+			 			if(xmlr.getText().equals(persone.getCodiceFiscale())) {
+			 				return true;
+					 	}
+			 		}
+			 break;
+			 }
+			 xmlr.next();
+			 }
+		return false;
 	}
 }

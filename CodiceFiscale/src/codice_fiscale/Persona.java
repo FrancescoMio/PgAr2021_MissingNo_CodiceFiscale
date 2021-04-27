@@ -17,6 +17,7 @@ public class Persona {
 	private int meseNascita;
 	private int annoNascita;
 	private String codiceFiscale;
+	private String assenza;
 	/**
 	 * @param nome
 	 * @param cognome
@@ -134,12 +135,21 @@ public class Persona {
 	public void setAnnoNascita(int annoNascita) {
 		this.annoNascita = annoNascita;
 	}
+	
+	public String getAssenza(){
+		return assenza;
+	}
+	
+	public void setAssenza(String assenza) {
+		this.assenza=assenza;
+	}
+	
 
 	@Override
 	public String toString() {
 		return "Persona [nome = " + nome + ", cognome = " + cognome + ", comuneNascita = " + comuneNascita + ", sesso = "
 				+ sesso + ", giornoNascita = " + giornoNascita + ", meseNascita = " + meseNascita + ", annoNascita = "
-				+ annoNascita + ", codiceFiscale = " + codiceFiscale + "]";
+				+ annoNascita + ", codiceFiscale = " + codiceFiscale + ", assente? = " + assenza + "]";
 	}
 	
 }
