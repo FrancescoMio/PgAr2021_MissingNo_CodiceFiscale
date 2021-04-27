@@ -11,6 +11,7 @@ public class Persona {
 	private String nome;
 	private String cognome;
 	private String comuneNascita;
+	private String comuneCodice;
 	private char sesso;
 	private int giornoNascita;
 	private int meseNascita;
@@ -70,6 +71,13 @@ public class Persona {
 	 */
 	public void setComuneNascita(String comuneNascita) {
 		this.comuneNascita = comuneNascita;
+	}
+	public String getComuneCodice() {
+		return comuneCodice;
+	}
+	
+	public void setComuneCodice(String comuneCodice) {
+		this.comuneCodice = comuneCodice;
 	}
 	/**
 	 * @return the sesso

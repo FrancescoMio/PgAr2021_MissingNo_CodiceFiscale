@@ -21,7 +21,7 @@ public class calcolatore {
 	
 	
 	static String elementName;
-	static String nome , cognome, comuneNascita, dataNascita;
+	static String nome , cognome, comuneNascita, dataNascita, comuneCodice;
 	static char sesso;
 	static int giornoNascita = 0, meseNascita = 0,  annoNascita = 0;
 	
@@ -71,6 +71,7 @@ public class calcolatore {
 			 case XMLStreamConstants.END_ELEMENT: // fine di un elemento: stampa il nome del tag chiuso
 				 if(xmlr.getLocalName().equals("persona")) {
 				 Persona persona = new Persona(nome, cognome, comuneNascita, sesso, giornoNascita, meseNascita, annoNascita);
+				 persona.setComuneCodice(comuneCodice);
 				 persone.add(persona);
 				 } 
 				 break; 
@@ -86,7 +87,8 @@ public class calcolatore {
 						 sesso = xmlr.getText().charAt(0);
 					 }
 					 else if(elementName.equals("comune_nascita")) {
-						 comuneNascita=trovaComune(xmlr.getText());
+						 comuneNascita=xmlr.getText();
+						 comuneCodice=trovaComune(xmlr.getText());
 					 }
 					 else {
 						 giornoNascita = calcolatore.calcolaGiornoNascita(xmlr.getText());
@@ -124,38 +126,125 @@ public class calcolatore {
 		 return "";
 	}
 	
-	/*public static String generazioneCodiceFiscale(Persona persone) {
-		String Vocali = "AEIOUaeiou";
-		String CodiceFiscale= "";
-		int contatore=0;
+	public static String generazioneCodiceFiscale(Persona persone) {
+		String vocaliGlobali = "AEIOUaeiou";
+		String codiceFiscale= "";
+		String consonanti="";
+		String vocali="";
 		
-		for (int i=0;i< persone.getCognome().length()-1; i++) {
+		//Cognome
+		for (int i=0;i< persone.getCognome().length(); i++) {
 			String lettera= String.valueOf(persone.getCognome().charAt(i));
-			if (!Vocali.contains(lettera)){
-				CodiceFiscale = CodiceFiscale.concat(lettera);
-				contatore++;
-				}
-		}
-		
-		if (contatore !=3) {
-			for (int i=0;i< persone.getCognome().length()-1; i++) {
-				String lettera2= String.valueOf(persone.getCognome().charAt(i));
-				if (Vocali.contains(lettera2)){
-					CodiceFiscale = CodiceFiscale.concat(lettera2);
-					contatore++;
-					}
-			}
-		}
+			if (!vocaliGlobali.contains(lettera)) 
+				consonanti =consonanti.concat(lettera);
 			
-		if (contatore !=3){
-			while(contatore!=3) {
-				CodiceFiscale = CodiceFiscale.concat("X");
-				contatore++;
+			else
+				vocali = vocali.concat(lettera);
+				
+		}
+		for (int i=0; i<consonanti.length()&&codiceFiscale.length()<3;i++) {
+			codiceFiscale=codiceFiscale.concat(String.valueOf(consonanti.charAt(i)));
+		}
+		for (int i=0; codiceFiscale.length()<3&&i<vocali.length(); i++) {
+			codiceFiscale=codiceFiscale.concat(String.valueOf(vocali.charAt(i)));
+		}
+		while(codiceFiscale.length()<3) {
+			codiceFiscale=codiceFiscale.concat("x");
 			}
+		
+		//Nome
+		consonanti="";
+		vocali="";
+		for (int i=0;i< persone.getNome().length(); i++) {
+			String lettera= String.valueOf(persone.getNome().charAt(i));
+			if (!vocaliGlobali.contains(lettera)) 
+				consonanti =consonanti.concat(lettera);
+			
+			else
+				vocali = vocali.concat(lettera);
+				
 		}
 		
-		return CodiceFiscale;
-	}*/
-	
-	
-}
+		if (consonanti.length()>3) {
+			codiceFiscale=codiceFiscale.concat(String.valueOf(consonanti.charAt(0)));
+			codiceFiscale=codiceFiscale.concat(String.valueOf(consonanti.charAt(2)));
+			codiceFiscale=codiceFiscale.concat(String.valueOf(consonanti.charAt(3)));
+		}
+		
+		else  {
+			for (int i=0; i<consonanti.length()&&codiceFiscale.length()<6;i++) {
+				codiceFiscale=codiceFiscale.concat(String.valueOf(consonanti.charAt(i)));
+			}
+			for (int i=0; codiceFiscale.length()<6&&i<vocali.length(); i++) {
+				codiceFiscale=codiceFiscale.concat(String.valueOf(vocali.charAt(i)));
+			}
+				while(codiceFiscale.length()<6) {
+					codiceFiscale=codiceFiscale.concat("x");
+					}
+				}
+		//Anno di nascita
+		String anno= String.valueOf((persone.getAnnoNascita()%100));
+		if (anno.length()==1) {
+			anno = "0"+anno;
+		}
+		codiceFiscale= codiceFiscale.concat(anno);
+		//Mese di nascita
+		String mese="";
+		switch (persone.getMeseNascita()) {
+		case 1:
+			mese="A";
+			break;
+		case 2:
+			mese="B";
+			break;
+		case 3:
+			mese="C";
+			break;
+		case 4:
+			mese="D";
+			break;
+		case 5:
+			mese="E";
+			break;
+		case 6:
+			mese="H";
+			break;
+		case 7:
+			mese="L";
+			break;
+		case 8:
+			mese="M";
+			break;
+		case 9:
+			mese="P";
+			break;
+		case 10:
+			mese="R";
+			break;
+		case 11:
+			mese="S";
+			break;
+		case 12:
+			mese="T";
+			break;
+			}
+		codiceFiscale= codiceFiscale.concat(mese);
+		//Giorno di nascita
+		if (persone.getSesso()=='F')
+			codiceFiscale=codiceFiscale.concat(String.valueOf(persone.getGiornoNascita()+40));
+		else {
+			if (persone.getGiornoNascita()<9)
+			codiceFiscale=  codiceFiscale.concat("0" + String.valueOf(persone.getGiornoNascita()));
+			else
+			codiceFiscale=codiceFiscale.concat(String.valueOf(persone.getGiornoNascita()));
+		}
+		//Comune di nascita
+		codiceFiscale= codiceFiscale.concat(persone.getComuneCodice());
+		//Carattere di Controllo
+		
+		//Questo è per te ;)
+		
+		return codiceFiscale;
+		}
+		
+	}
