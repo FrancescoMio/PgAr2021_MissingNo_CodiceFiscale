@@ -12,8 +12,6 @@ public class CodiceFiscaleMain {
 		calcolatore.creaPersone(persone);
 		for(int i = 0; i < 5; i++) {
 			System.out.println(persone.get(i).toString());
-			System.out.println(calcolatore.generazioneCodiceFiscale(persone.get(i)));
-			
 	}
 }
 }

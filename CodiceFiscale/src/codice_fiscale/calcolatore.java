@@ -5,6 +5,7 @@ package codice_fiscale;
 
 import java.io.FileInputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
@@ -72,6 +73,7 @@ public class calcolatore {
 				 if(xmlr.getLocalName().equals("persona")) {
 				 Persona persona = new Persona(nome, cognome, comuneNascita, sesso, giornoNascita, meseNascita, annoNascita);
 				 persona.setComuneCodice(comuneCodice);
+				 persona.setCodiceFiscale(calcolatore.generazioneCodiceFiscale(persona));
 				 persone.add(persona);
 				 } 
 				 break; 
@@ -131,6 +133,7 @@ public class calcolatore {
 		String codiceFiscale= "";
 		String consonanti="";
 		String vocali="";
+		char cin;
 		
 		//Cognome
 		for (int i=0;i< persone.getCognome().length(); i++) {
@@ -244,19 +247,45 @@ public class calcolatore {
 		
 		//Questo è per te ;)
 		
-		if (codiceFiscale.length()==15) {
+		if (codiceFiscale.length() == 15) {
 			ArrayList<Character> charPari = new ArrayList<Character>();
 			ArrayList<Character> charDispari = new ArrayList<Character>();
 			for (int i=0; i<codiceFiscale.length();i++) {
-				if (i%2==0) 
+				if (i % 2 == 0) 
 					charDispari.add(codiceFiscale.charAt(i));
 				else 
 					charPari.add(codiceFiscale.charAt(i));
 			}
-			
-			System.out.println(charPari);
-			System.out.println(charDispari);
+			int somma = 0;
+			for(int i = 0; i < charPari.size(); i++) {
+				int ascii = charPari.get(i);
+				if(ascii < 65) 
+					somma += ascii - 48;
+				else 
+					somma += ascii - 65;
+			}
+			//String lettereDispari[] = {"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"};
+			int dispari[] = {1,0,5,7,9,13,15,17,19,21,2,4,18,20,11,3,6,8,12,14,16,10,22,25,24,23};
+			int [] dispari2 = {1,0,5,7,9,13,15,17,19,21};
+			for(int i = 0; i < charDispari.size(); i++) {
+				int ascii = charDispari.get(i);
+				if(ascii < 65) {
+					int numero = ascii - 48;
+					int valore = dispari2[numero];
+					somma += valore;
+				}
+				else {
+					int numero = ascii - 65;
+					int valore = dispari[numero];
+					somma += valore;
+				}
+			}
+			int resto = somma % 26;
+			int ascii = resto + 65;
+			cin = ((char)ascii);
+			codiceFiscale = codiceFiscale.concat(String.valueOf(cin));
 		}
+		
 		return codiceFiscale;
 	}
 }

@@ -35,6 +35,13 @@ public class Persona {
 		this.meseNascita = meseNascita;
 		this.annoNascita = annoNascita;
 	}
+	public String getCodiceFiscale() {
+		return codiceFiscale;
+	}
+	
+	public void setCodiceFiscale(String codice) {
+		codiceFiscale = codice;
+	}
 	
 	/**
 	 * @return the nome
