@@ -3,14 +3,37 @@
  */
 package codice_fiscale;
 
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 
 
@@ -85,13 +108,13 @@ public class calcolatore {
 			 case XMLStreamConstants.CHARACTERS:
 				 if (xmlr.getText().trim().length() > 0){ // content all’interno di un elemento: stampa il testo					 
 					 if(elementName.equals("nome")) {
-						 nome = xmlr.getText();
+						 nome = xmlr.getText().toUpperCase();
 					 }
 					 else if(elementName.equals("cognome")) {
-						 cognome = xmlr.getText();
+						 cognome = xmlr.getText().toUpperCase();
 					 }
 					 else if(elementName.equals("sesso")) {
-						 sesso = xmlr.getText().charAt(0);
+						 sesso = xmlr.getText().toUpperCase().charAt(0);
 					 }
 					 else if(elementName.equals("comune_nascita")) {
 						 comuneNascita=xmlr.getText();
@@ -134,13 +157,15 @@ public class calcolatore {
 	}
 	
 	public static String generazioneCodiceFiscale(Persona persone) {
-		String vocaliGlobali = "AEIOUaeiou";
+		String vocaliGlobali = "AEIOU";
 		String codiceFiscale= "";
 		String consonanti="";
 		String vocali="";
 		char cin;
 		
 		//Cognome
+		if (persone.getCognome().length()==0)
+			return "ERROR";
 		for (int i=0;i< persone.getCognome().length(); i++) {
 			String lettera= String.valueOf(persone.getCognome().charAt(i));
 			if (!vocaliGlobali.contains(lettera)) 
@@ -164,6 +189,8 @@ public class calcolatore {
 		//Nome
 		consonanti="";
 		vocali="";
+		if (persone.getNome().length()==0)
+			return "ERROR";
 		for (int i=0;i< persone.getNome().length(); i++) {
 			String lettera= String.valueOf(persone.getNome().charAt(i));
 			if (!vocaliGlobali.contains(lettera)) 
@@ -333,4 +360,74 @@ public class calcolatore {
 			 }
 		return false;
 	}
+	
+	public static void scritturaXML(ArrayList<Persona> persone) /*throws XMLStreamException, ParserConfigurationException, TransformerFactoryConfigurationError, SAXException, IOException, TransformerException*/ {
+		XMLOutputFactory xmlof = null;
+		XMLStreamWriter xmlw = null;
+		try {   
+		xmlof = XMLOutputFactory.newInstance();
+		xmlw = xmlof.createXMLStreamWriter(new FileOutputStream("CodiceFiscale/src/XML/codiciPersone.xml"), "utf-8");
+		xmlw.writeStartDocument("utf-8", "1.0");
+		xmlw.writeStartElement("output");
+		xmlw.writeStartElement("persone");
+		xmlw.writeAttribute("numero", Integer.toString(persone.size()));
+		for (int i=0; i<persone.size();i++) {
+			xmlw.writeStartElement("persona");
+			xmlw.writeAttribute("id", Integer.toString(i));
+			
+			xmlw.writeStartElement("nome");
+			xmlw.writeCharacters(persone.get(i).getNome());
+			xmlw.writeEndElement();
+			
+			xmlw.writeStartElement("cognome");
+			xmlw.writeCharacters(persone.get(i).getCognome());
+			xmlw.writeEndElement();
+			
+			xmlw.writeStartElement("sesso");
+			xmlw.writeCharacters(String.valueOf(persone.get(i).getSesso()));
+			xmlw.writeEndElement();
+			
+			xmlw.writeStartElement("comune_nascita");
+			xmlw.writeCharacters(persone.get(i).getComuneNascita());
+			xmlw.writeEndElement();
+			
+			xmlw.writeStartElement("data_nascita");
+			xmlw.writeCharacters(persone.get(i).data());
+			xmlw.writeEndElement();
+			
+			xmlw.writeStartElement("codice_fiscale");
+			xmlw.writeCharacters(persone.get(i).getAssenza());
+			xmlw.writeEndElement();
+			
+			xmlw.writeEndElement();
+			
+		}
+		xmlw.writeEndElement();
+		xmlw.writeEndElement();
+		xmlw.writeEndDocument();
+		xmlw.flush();  
+		xmlw.close();
+		} catch (Exception e) {
+			System.out.println("Errore nell'inizializzazione del writer:");
+			System.out.println(e.getMessage());
+			
+		}
+		
+		/*DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setValidating(false);
+        DocumentBuilder db = dbf.newDocumentBuilder();
+         
+        Document doc = db.parse(new FileInputStream(new File("CodiceFiscale/src/XML/codiciPersone.xml")));
+        Transformer tf = TransformerFactory.newInstance().newTransformer();
+        tf.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+        tf.setOutputProperty(OutputKeys.INDENT, "yes");
+        Writer out = new StringWriter();
+        tf.transform(new DOMSource(doc), new StreamResult(out));
+        File file = new File ("CodiceFiscale/src/XML/codiciPersone.xml");
+		PrintStream stream = new PrintStream(file);
+        System.setOut(stream);
+        System.out.println(out.toString());*/
+		
+	}
+	
 }

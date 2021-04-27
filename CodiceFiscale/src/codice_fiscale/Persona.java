@@ -144,6 +144,10 @@ public class Persona {
 		this.assenza=assenza;
 	}
 	
+	public String data() {
+		return getAnnoNascita()+"-"+getMeseNascita()+"-"+getGiornoNascita();
+	}
+	
 
 	@Override
 	public String toString() {
