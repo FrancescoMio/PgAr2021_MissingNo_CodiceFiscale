@@ -13,8 +13,7 @@ Creato e modellato usando solamente il miglior e unico vero ide java "Eclipse".
 </Features>
 <Bugs numero="1">
   <bug>You tell me</bug>
-  </Bugs>
-
+</Bugs>
 
 Your warranty is now void.
 
