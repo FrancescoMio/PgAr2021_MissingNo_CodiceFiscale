@@ -282,6 +282,7 @@ public class calcolatore {
 		
 		if (persone.getMeseNascita()==2) {
 			if (persone.getGiornoNascita()>28)
+				if (persone.getAnnoNascita()%4==0)
 				return "ERROR";
 		}
 				
@@ -412,6 +413,7 @@ public class calcolatore {
 			System.out.println(e.getMessage());
 			
 		}
+		//Questo qua sotto è per rendere l'xml leggibile
 		
 		/*DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setValidating(false);
@@ -427,6 +429,90 @@ public class calcolatore {
 		PrintStream stream = new PrintStream(file);
         System.setOut(stream);
         System.out.println(out.toString());*/
+		
+	}
+	
+	public static boolean codiceInvalido(String codiceFiscale) { //Controlla se un codice fiscale è invalido, e se si, retrun true
+		
+		String vocaliGlobali = "AEIOU";
+		String mesi = "ABCDEHLMPRST";
+		//Controllo validità generale
+		if (codiceFiscale.length()!=16){
+			return true;
+		}
+		for (int i=0; i<16; i++) {
+			if (i==6 ||i==7 || i==9 || i==10 || i==12 ||i==13 ||i==14) {
+				if (codiceFiscale.charAt(i)<48 || codiceFiscale.charAt(i)>57) {
+					return true;
+					}
+				else
+					if (codiceFiscale.charAt(i)<65 || codiceFiscale.charAt(i)>90)
+						return true;
+					
+			}
+			
+		}
+		
+		//Controllo validità mese
+		if (!mesi.contains(String.valueOf(codiceFiscale.charAt(8))))
+			return true;
+		
+		
+		
+		//Controllo validità giorno
+		
+		int giorno = ((codiceFiscale.charAt(9)-48)*10 +(codiceFiscale.charAt(10)-48));
+		
+		if (giorno>31)
+			giorno = giorno-40;
+		
+		if (giorno<1 || giorno >31)
+			return true;
+		
+		//Qua bisogna verificare se il giorno può esistere all'interno del mese xyz
+		
+		
+		
+		//Controllo validità Cognome	
+		for (int i=0; i<2; i++) {
+			if (vocaliGlobali.contains(String.valueOf(codiceFiscale.charAt(i)))) {
+				for (int j=i+1; j<3; j++) {
+					if (!vocaliGlobali.contains(String.valueOf(codiceFiscale.charAt(j)))) {
+						if('X'==codiceFiscale.charAt(j)) {
+							if (j==1 && 'X'!=codiceFiscale.charAt(j+1)) {
+								return true;
+							}
+						}
+						else
+							return true;
+					}
+				}
+			}
+			
+		}
+		
+		//Controllo validità Nome
+		
+		for (int i=3; i<5; i++) {
+			if (vocaliGlobali.contains(String.valueOf(codiceFiscale.charAt(i)))) {
+				for (int j=i+1; j<6; j++) {
+					if (!vocaliGlobali.contains(String.valueOf(codiceFiscale.charAt(j)))) {
+						if('X'==codiceFiscale.charAt(j)) {
+							if (j==1 && 'X'!=codiceFiscale.charAt(j+1)) {
+								return true;
+							}
+						}
+						else
+							return true;
+					}
+				}
+			}
+			
+		}
+		
+		
+		
+		return false;
 		
 	}
 	
