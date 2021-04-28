@@ -4,7 +4,7 @@ Super (in)efficiente, unbreakable as chalk, commentatissimo solo sulle parti ban
 
 Creato e modellato usando solamente il miglior e unico vero ide java "Eclipse".
 
-<Features numero="5">
+"<Features numero="5">
   <feature>Legge xml</feature>
   <feature>Scrive xml</feature>
   <feature>Crea codici fiscali</feature>
@@ -13,7 +13,7 @@ Creato e modellato usando solamente il miglior e unico vero ide java "Eclipse".
 </Features>
 <Bugs numero="1">
   <bug>You tell me</bug>
-  </Bugs>
+  </Bugs>"
 
 
 Your warranty is now void.
