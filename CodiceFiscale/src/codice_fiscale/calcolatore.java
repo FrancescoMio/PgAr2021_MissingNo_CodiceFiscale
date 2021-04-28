@@ -252,7 +252,7 @@ public class calcolatore {
 	}
 	
 	
-	public static boolean codiceInvalido(String codiceFiscale) { //Controlla se un codice fiscale è invalido, e se si, return true
+	public static boolean codiceInvalido(String codiceFiscale) throws XMLStreamException { //Controlla se un codice fiscale è invalido, e se si, return true
 		String mesi = "ABCDEHLMPRST";
 		//Controllo validità generale
 		
@@ -289,6 +289,13 @@ public class calcolatore {
 		int anno= ((codiceFiscale.charAt(6)-48)*10 +(codiceFiscale.charAt(7)-48)); //Prendo l'anno
 		
 		if (controlGiorno(anno, codiceFiscale.charAt(8), giorno)) //Verifico se il giorno esiste nel mese
+			return true;
+		
+		//Controllo se il comune esiste
+		
+		String comune= "" + codiceFiscale.charAt(11) + codiceFiscale.charAt(12) + codiceFiscale.charAt(13) + codiceFiscale.charAt(14);
+		
+		if (!inputOutput.verificaComune(comune))
 			return true;
 		
 		//Controllo se il Cin è corretto

@@ -84,25 +84,43 @@ public class inputOutput {
 	private static String trovaComune(String comuneNascita ) throws XMLStreamException { //trova codice relativo al comune
 		XMLStreamReader xmlr = creaLettore("CodiceFiscale/src/XML/comuni.xml");
 		boolean check=false;
-		 while (xmlr.hasNext()) { 
-			 switch (xmlr.getEventType()) {
-			 case XMLStreamConstants.START_ELEMENT:
-				 if (xmlr.getLocalName().equals("codice")&&check) {
-					 xmlr.next();
-					 return xmlr.getText();
-				 }
-				 break;
-			 case XMLStreamConstants.CHARACTERS:
-			 		if (xmlr.getText().trim().length() > 0){
-			 			if(xmlr.getText().equals(comuneNascita)) {
-			 				check=true;
-					 	}
-			 		}
-			 		break;
-			 }
-			 xmlr.next();
-		 }
-		 return "";
+		while (xmlr.hasNext()) { 
+			switch (xmlr.getEventType()) {
+			case XMLStreamConstants.START_ELEMENT:
+				if (xmlr.getLocalName().equals("codice")&&check) {
+					xmlr.next();
+					return xmlr.getText();
+				}
+				break;
+			case XMLStreamConstants.CHARACTERS:
+				if (xmlr.getText().trim().length() > 0){
+					if(xmlr.getText().equals(comuneNascita)) {
+						check=true;
+					 }
+				}
+				break;
+			}
+			xmlr.next();
+		}
+		return "";
+	}
+	
+	
+	public static boolean verificaComune(String comune) throws XMLStreamException {//Verifica la presenza di un comune all'interno di comuni.xml, ritorna true se si
+		XMLStreamReader xmlr = creaLettore("CodiceFiscale/src/XML/comuni.xml");
+		while (xmlr.hasNext()) { 
+			switch (xmlr.getEventType()) {
+			case XMLStreamConstants.START_ELEMENT:
+				if (xmlr.getLocalName().equals("codice")) {
+					xmlr.next();
+					if (xmlr.getText().equals(comune))
+							return true;
+				}
+				break;
+			}
+			xmlr.next();
+		}
+		return false;
 	}
 	
 	public static boolean esisteCodice(Persona persone) throws XMLStreamException { //Questo metodo controlla che il codice fiscale di una persona sia presente in codiciFiscali.xml
