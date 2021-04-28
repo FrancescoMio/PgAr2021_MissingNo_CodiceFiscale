@@ -11,7 +11,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-public class inputOutput {
+public class InputOutput {//Questa classe si occupa di leggere e/o scrivere cose da file
 	
 	
 	static String elementName;
@@ -45,7 +45,7 @@ public class inputOutput {
 				 if(xmlr.getLocalName().equals("persona")) {
 				 Persona persona = new Persona(nome, cognome, comuneNascita, sesso, giornoNascita, meseNascita, annoNascita);
 				 persona.setComuneCodice(comuneCodice);
-				 persona.setCodiceFiscale(calcolatore.generazioneCodiceFiscale(persona));
+				 persona.setCodiceFiscale(Calcolatore.generazioneCodiceFiscale(persona));
 				 if (!esisteCodice(persona))
 					 persona.setAssenza("ASSENTE");
 				else
@@ -70,9 +70,9 @@ public class inputOutput {
 						 comuneCodice=trovaComune(xmlr.getText());
 					 }
 					 else {
-						 giornoNascita = calcolatore.calcolaGiornoNascita(xmlr.getText());
-						 meseNascita = calcolatore.calcolaMeseNascita(xmlr.getText());
-						 annoNascita = calcolatore.calcolaAnnoNascita(xmlr.getText());
+						 giornoNascita = Calcolatore.calcolaGiornoNascita(xmlr.getText());
+						 meseNascita = Calcolatore.calcolaMeseNascita(xmlr.getText());
+						 annoNascita = Calcolatore.calcolaAnnoNascita(xmlr.getText());
 					 }
 				 }
 				 break;
@@ -163,7 +163,7 @@ public class inputOutput {
 	//Metodo che crea CodiciPersone.xml
 	
 	public static void scritturaXML(ArrayList<Persona> persone) throws XMLStreamException /*ParserConfigurationException, TransformerFactoryConfigurationError, SAXException, IOException, TransformerException*/ {
-		ArrayList<String> codici =inputOutput.getCodici(); //Insieme dei codici Fiscali di codiciFiscali.xml
+		ArrayList<String> codici =InputOutput.getCodici(); //Insieme dei codici Fiscali di codiciFiscali.xml
 		ArrayList<String> invalidi = new ArrayList<String>();
 		ArrayList<String> spaiati= new ArrayList<String>();
 		boolean check = true;
@@ -211,7 +211,7 @@ public class inputOutput {
 		xmlw.writeStartElement("codici");//Inizio codici
 		
 		for (int i=0; i<codici.size(); i++) {
-			if (calcolatore.codiceInvalido(codici.get(i))) { //Se un codice fiscale di codici è invalido, aggiungilo ad invalidi
+			if (Calcolatore.codiceInvalido(codici.get(i))) { //Se un codice fiscale di codici è invalido, aggiungilo ad invalidi
 				invalidi.add(codici.get(i));
 			}
 				for (int j=0; j<persone.size(); j++) {

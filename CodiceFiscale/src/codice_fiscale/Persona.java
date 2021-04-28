@@ -1,13 +1,6 @@
-/**
- * 
- */
 package codice_fiscale;
 
-/**
- * @author FRANCESCO MIO
- *
- */
-public class Persona {
+public class Persona {//Beh, persona
 	private String nome;
 	private String cognome;
 	private String comuneNascita;
