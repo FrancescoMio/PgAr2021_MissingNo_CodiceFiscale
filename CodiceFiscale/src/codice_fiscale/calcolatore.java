@@ -42,12 +42,8 @@ import org.xml.sax.SAXException;
  *
  */
 public class calcolatore {
-	
-	
-	static String elementName;
-	static String nome , cognome, comuneNascita, dataNascita, comuneCodice;
-	static char sesso;
-	static int giornoNascita = 0, meseNascita = 0,  annoNascita = 0;
+	static String vocaliGlobali = "AEIOU";
+	static String consonantiGlobali="BCDFGHJKLMNPQRSTVWXYZ";
 	
 	public static int calcolaGiornoNascita(String dataNascita) {
 		String[] parts = dataNascita.split("-");
@@ -70,157 +66,73 @@ public class calcolatore {
 		return annoNascita;
 	}
 	
-	public static XMLStreamReader creaLettore(String filename) { //crea un Lettore xmlr
-		XMLInputFactory xmlif = null;
-		XMLStreamReader xmlr = null;
-		try {
-		 xmlif = XMLInputFactory.newInstance();
-		 xmlr = xmlif.createXMLStreamReader(filename, new FileInputStream(filename));
-		} catch (Exception e) {
-		 System.out.println("Errore nell'inizializzazione del reader:");
-		 System.out.println(e.getMessage());
-		 return null;
-		}
-		return xmlr;
-	}
-	
-	public static void creaPersone(ArrayList<Persona> persone) throws XMLStreamException {
+	public static String generazioneCodiceFiscale(Persona persone) {//Metodo adibito alla creazione del codicice fiscale
 		
-		XMLStreamReader xmlr = creaLettore("CodiceFiscale/src/XML/inputPersone.xml");
-		while (xmlr.hasNext()) { // continua a leggere finché ha eventi a disposizione
-			 switch (xmlr.getEventType()) {
-			 case XMLStreamConstants.START_ELEMENT:
-				 elementName = xmlr.getLocalName();
-				 break;
-			 case XMLStreamConstants.END_ELEMENT: // fine di un elemento: stampa il nome del tag chiuso
-				 if(xmlr.getLocalName().equals("persona")) {
-				 Persona persona = new Persona(nome, cognome, comuneNascita, sesso, giornoNascita, meseNascita, annoNascita);
-				 persona.setComuneCodice(comuneCodice);
-				 persona.setCodiceFiscale(calcolatore.generazioneCodiceFiscale(persona));
-				 if (!esisteCodice(persona))
-					 persona.setAssenza("ASSENTE");
-				else
-					persona.setAssenza(persona.getCodiceFiscale());
-						 
-				 persone.add(persona);
-				 } 
-				 break; 
-			 case XMLStreamConstants.CHARACTERS:
-				 if (xmlr.getText().trim().length() > 0){ // content all’interno di un elemento: stampa il testo					 
-					 if(elementName.equals("nome")) {
-						 nome = xmlr.getText().toUpperCase();
-					 }
-					 else if(elementName.equals("cognome")) {
-						 cognome = xmlr.getText().toUpperCase();
-					 }
-					 else if(elementName.equals("sesso")) {
-						 sesso = xmlr.getText().toUpperCase().charAt(0);
-					 }
-					 else if(elementName.equals("comune_nascita")) {
-						 comuneNascita=xmlr.getText();
-						 comuneCodice=trovaComune(xmlr.getText());
-					 }
-					 else {
-						 giornoNascita = calcolatore.calcolaGiornoNascita(xmlr.getText());
-						 meseNascita = calcolatore.calcolaMeseNascita(xmlr.getText());
-						 annoNascita = calcolatore.calcolaAnnoNascita(xmlr.getText());
-					 }
-				 }
-				 break;
-			 }
-			 xmlr.next();
-		}
-	}
-	
-	private static String trovaComune(String comuneNascita ) throws XMLStreamException { //trova codice relativo al comune
-		XMLStreamReader xmlr = creaLettore("CodiceFiscale/src/XML/comuni.xml");
-		boolean check=false;
-		 while (xmlr.hasNext()) { // continua a leggere finché ha eventi a disposizione
-			 switch (xmlr.getEventType()) {
-			 case XMLStreamConstants.START_ELEMENT:
-				 if (xmlr.getLocalName().equals("codice")&&check) {
-					 xmlr.next();
-					 return xmlr.getText();
-				 }
-				 break;
-			 case XMLStreamConstants.CHARACTERS:
-			 		if (xmlr.getText().trim().length() > 0){
-			 			if(xmlr.getText().equals(comuneNascita)) {
-			 				check=true;
-					 	}
-			 		}
-			 		break;
-			 }
-			 xmlr.next();
-		 }
-		 return "";
-	}
-	
-	public static String generazioneCodiceFiscale(Persona persone) {
-		String vocaliGlobali = "AEIOU";
 		String codiceFiscale= "";
 		String consonanti="";
 		String vocali="";
 		char cin;
 		
 		//Cognome
-		if (persone.getCognome().length()==0)
+		
+		if (persone.getCognome().length()==0) //Se il cognome ha dimensione 0, return ERRORE
 			return "ERROR";
 		for (int i=0;i< persone.getCognome().length(); i++) {
 			String lettera= String.valueOf(persone.getCognome().charAt(i));
-			if (!vocaliGlobali.contains(lettera)) 
+			if (consonantiGlobali.contains(lettera)) 
 				consonanti =consonanti.concat(lettera);
 			else if (vocaliGlobali.contains(lettera))
 				vocali = vocali.concat(lettera);
 			else
-				return "ERROR";
+				return "ERROR"; //se "lettera" non è ne una vocale, ne una consonante, return ERRORE
 				
 		}
-		for (int i=0; i<consonanti.length()&&codiceFiscale.length()<3;i++) {
+		for (int i=0; i<consonanti.length()&&codiceFiscale.length()<3;i++) { //Scrivo nel codiceFiscale le consonanti
 			codiceFiscale=codiceFiscale.concat(String.valueOf(consonanti.charAt(i)));
 		}
-		for (int i=0; codiceFiscale.length()<3&&i<vocali.length(); i++) {
+		for (int i=0; codiceFiscale.length()<3&&i<vocali.length(); i++) { //Scrivo nel codiceFiscale le vocali (se c'è spazio)
 			codiceFiscale=codiceFiscale.concat(String.valueOf(vocali.charAt(i)));
 		}
-		while(codiceFiscale.length()<3) {
+		while(codiceFiscale.length()<3) { //Se il codiceFiscale non è ancora di dimensione 3, riempi gli spazi con 'X'
 			codiceFiscale=codiceFiscale.concat("X");
 			}
 		
 		//Nome
+		
 		consonanti="";
 		vocali="";
-		if (persone.getNome().length()==0)
+		if (persone.getNome().length()==0) //Se il nome ha dimensione 0, return ERRORE
 			return "ERROR";
 		for (int i=0;i< persone.getNome().length(); i++) {
 			String lettera= String.valueOf(persone.getNome().charAt(i));
-			if (!vocaliGlobali.contains(lettera)) 
+			if (consonantiGlobali.contains(lettera)) 
 				consonanti =consonanti.concat(lettera);
 			else if (vocaliGlobali.contains(lettera))
 				vocali = vocali.concat(lettera);
 			else
-				return "ERROR";
+				return "ERROR"; //se "lettera" non è ne una vocale, ne una consonante, return ERRORE
 		}
 		
-		if (consonanti.length()>3) {
+		if (consonanti.length()>3) { //se ci sono 4 o + consonanti, scrivi nel codiceFiscale le consonanti opportune
 			codiceFiscale=codiceFiscale.concat(String.valueOf(consonanti.charAt(0)));
 			codiceFiscale=codiceFiscale.concat(String.valueOf(consonanti.charAt(2)));
 			codiceFiscale=codiceFiscale.concat(String.valueOf(consonanti.charAt(3)));
 		}
 		
 		else  {
-			for (int i=0; i<consonanti.length()&&codiceFiscale.length()<6;i++) {
+			for (int i=0; i<consonanti.length()&&codiceFiscale.length()<6;i++) {	//Scrivo nel codiceFiscale le consonanti
 				codiceFiscale=codiceFiscale.concat(String.valueOf(consonanti.charAt(i)));
 			}
-			for (int i=0; codiceFiscale.length()<6&&i<vocali.length(); i++) {
+			for (int i=0; codiceFiscale.length()<6&&i<vocali.length(); i++) {	//Scrivo nel codiceFiscale le vocali (se c'è spazio)
 				codiceFiscale=codiceFiscale.concat(String.valueOf(vocali.charAt(i)));
 			}
-				while(codiceFiscale.length()<6) {
+				while(codiceFiscale.length()<6) {	//Se il codiceFiscale non è ancora di dimensione 3, riempi gli spazi con 'X'
 					codiceFiscale=codiceFiscale.concat("x");
 					}
 				}
 		//Anno di nascita
-		String anno= String.valueOf((persone.getAnnoNascita()%100));
-		if (anno.length()==1) {
+		String anno= String.valueOf((persone.getAnnoNascita()%100));//Prendo solo le ultime due cifre dell'anno
+		if (anno.length()==1) { //Se l'anno ha dimensione 1, aggiungi uno zero prima
 			anno = "0"+anno;
 		}
 		codiceFiscale= codiceFiscale.concat(anno);
@@ -265,240 +177,149 @@ public class calcolatore {
 			mese="T";
 			break;
 		default:
-			return "ERROR";
+			return "ERROR"; //Se il mese non esiste, return ERROR
 			}
 		codiceFiscale= codiceFiscale.concat(mese);
 		
 		//Giorno di nascita
-		if (persone.getMeseNascita()==1 || persone.getMeseNascita()==3 || persone.getMeseNascita()==5 || persone.getMeseNascita()==7 || persone.getMeseNascita()==8 || persone.getMeseNascita()==10 || persone.getMeseNascita()==12) {
-			if (persone.getGiornoNascita()>31)
-				return "ERROR";
-		}
 		
-		if (persone.getMeseNascita()==4 || persone.getMeseNascita()==6 || persone.getMeseNascita()==4 || persone.getMeseNascita()==9 || persone.getMeseNascita()==11) {
-			if (persone.getGiornoNascita()>30)
-				return "ERROR";
-		}
+		if (persone.getGiornoNascita()<1)
+			return "ERROR";
 		
-		if (persone.getMeseNascita()==2) {
-			if (persone.getGiornoNascita()>28)
-				if (persone.getAnnoNascita()%4==0)
-				return "ERROR";
-		}
+		if(controlGiorno(persone.getAnnoNascita(), codiceFiscale.charAt(8), persone.getGiornoNascita())) 
+			return "ERROR";
 				
-		if (persone.getSesso()=='F')
+		if (persone.getSesso()=='F') //Se sei una donna, aggiungi 40 al giorno
 			codiceFiscale=codiceFiscale.concat(String.valueOf(persone.getGiornoNascita()+40));
+		
 		else {
 			if (persone.getGiornoNascita()<10)
-			codiceFiscale=  codiceFiscale.concat("0" + String.valueOf(persone.getGiornoNascita()));
+			codiceFiscale=  codiceFiscale.concat("0" + String.valueOf(persone.getGiornoNascita())); //Se il giorno ha solo una cifra, aggiungi 0 prima
 			else
 			codiceFiscale=codiceFiscale.concat(String.valueOf(persone.getGiornoNascita()));
 		}
 		//Comune di nascita
-		codiceFiscale= codiceFiscale.concat(persone.getComuneCodice());
-		//Carattere di Controllo
-		if (codiceFiscale.length() == 15) {
-			ArrayList<Character> charPari = new ArrayList<Character>();
-			ArrayList<Character> charDispari = new ArrayList<Character>();
-			for (int i=0; i<codiceFiscale.length();i++) {
-				if (i % 2 == 0) 
-					charDispari.add(codiceFiscale.charAt(i));
-				else 
-					charPari.add(codiceFiscale.charAt(i));
-			}
-			int somma = 0;
-			for(int i = 0; i < charPari.size(); i++) {
-				int ascii = charPari.get(i);
-				if(ascii < 65) 
-					somma += ascii - 48;
-				else 
-					somma += ascii - 65;
-			}
-			//String lettereDispari[] = {"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"};
-			int dispari[] = {1,0,5,7,9,13,15,17,19,21,2,4,18,20,11,3,6,8,12,14,16,10,22,25,24,23};
-			int [] dispari2 = {1,0,5,7,9,13,15,17,19,21};
-			for(int i = 0; i < charDispari.size(); i++) {
-				int ascii = charDispari.get(i);
-				if(ascii < 65) {
-					int numero = ascii - 48;
-					int valore = dispari2[numero];
-					somma += valore;
-				}
-				else {
-					int numero = ascii - 65;
-					int valore = dispari[numero];
-					somma += valore;
-				}
-			}
-			int resto = somma % 26;
-			int ascii = resto + 65;
-			cin = ((char)ascii);
-			codiceFiscale = codiceFiscale.concat(String.valueOf(cin));
-			return codiceFiscale;
-		}
-		else
+		
+		if (persone.getComuneCodice()=="")
 			return "ERROR";
 		
-		
+		codiceFiscale= codiceFiscale.concat(persone.getComuneCodice());
+		//Carattere di Controllo
+		cin = creazioneCin(codiceFiscale);
+		codiceFiscale = codiceFiscale.concat(String.valueOf(cin));
+		return codiceFiscale;
 	}
 	
-	public static Boolean esisteCodice(Persona persone) throws XMLStreamException {
-		if (persone.getCodiceFiscale().equals("ERROR")) {
-			return false;
+
+	public static char creazioneCin(String codiceFiscale) { //Creazione carattere di controllo
+		if (codiceFiscale.length()==16)
+				codiceFiscale= codiceFiscale.substring(0, codiceFiscale.length() - 1);
+		ArrayList<Character> charPari = new ArrayList<Character>();
+		ArrayList<Character> charDispari = new ArrayList<Character>();
+		for (int i=0; i<codiceFiscale.length();i++) {
+			if (i % 2 == 0) 
+				charDispari.add(codiceFiscale.charAt(i));
+			else 
+				charPari.add(codiceFiscale.charAt(i));
 		}
-		XMLStreamReader xmlr = creaLettore("CodiceFiscale/src/XML/codiciFiscali.xml");
-		while (xmlr.hasNext()) { // continua a leggere finché ha eventi a disposizione
-			 switch (xmlr.getEventType()) {
-			 case XMLStreamConstants.CHARACTERS:
-			 		if (xmlr.getText().trim().length() > 0){
-			 			if(xmlr.getText().equals(persone.getCodiceFiscale())) {
-			 				return true;
-					 	}
-			 		}
-			 break;
-			 }
-			 xmlr.next();
-			 }
-		return false;
+		int somma = 0;
+		for(int i = 0; i < charPari.size(); i++) {
+			int ascii = charPari.get(i);
+			if(ascii < 65) 
+				somma += ascii - 48;
+			else 
+				somma += ascii - 65;
+		}
+		//String lettereDispari[] = {"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"};
+		int dispari[] = {1,0,5,7,9,13,15,17,19,21,2,4,18,20,11,3,6,8,12,14,16,10,22,25,24,23};
+		int [] dispari2 = {1,0,5,7,9,13,15,17,19,21};
+		for(int i = 0; i < charDispari.size(); i++) {
+			int ascii = charDispari.get(i);
+			if(ascii < 65) {
+				int numero = ascii - 48;
+				int valore = dispari2[numero];
+				somma += valore;
+			}
+			else {
+				int numero = ascii - 65;
+				int valore = dispari[numero];
+				somma += valore;
+			}
+		}
+		int resto = somma % 26;
+		int ascii = resto + 65;
+		return ((char)ascii);
 	}
 	
-	public static void scritturaXML(ArrayList<Persona> persone) /*throws XMLStreamException, ParserConfigurationException, TransformerFactoryConfigurationError, SAXException, IOException, TransformerException*/ {
-		XMLOutputFactory xmlof = null;
-		XMLStreamWriter xmlw = null;
-		try {   
-		xmlof = XMLOutputFactory.newInstance();
-		xmlw = xmlof.createXMLStreamWriter(new FileOutputStream("CodiceFiscale/src/XML/codiciPersone.xml"), "utf-8");
-		xmlw.writeStartDocument("utf-8", "1.0");
-		xmlw.writeStartElement("output");
-		xmlw.writeStartElement("persone");
-		xmlw.writeAttribute("numero", Integer.toString(persone.size()));
-		for (int i=0; i<persone.size();i++) {
-			xmlw.writeStartElement("persona");
-			xmlw.writeAttribute("id", Integer.toString(i));
-			
-			xmlw.writeStartElement("nome");
-			xmlw.writeCharacters(persone.get(i).getNome());
-			xmlw.writeEndElement();
-			
-			xmlw.writeStartElement("cognome");
-			xmlw.writeCharacters(persone.get(i).getCognome());
-			xmlw.writeEndElement();
-			
-			xmlw.writeStartElement("sesso");
-			xmlw.writeCharacters(String.valueOf(persone.get(i).getSesso()));
-			xmlw.writeEndElement();
-			
-			xmlw.writeStartElement("comune_nascita");
-			xmlw.writeCharacters(persone.get(i).getComuneNascita());
-			xmlw.writeEndElement();
-			
-			xmlw.writeStartElement("data_nascita");
-			xmlw.writeCharacters(persone.get(i).data());
-			xmlw.writeEndElement();
-			
-			xmlw.writeStartElement("codice_fiscale");
-			xmlw.writeCharacters(persone.get(i).getAssenza());
-			xmlw.writeEndElement();
-			
-			xmlw.writeEndElement();
-			
-		}
-		xmlw.writeEndElement();
-		xmlw.writeEndElement();
-		xmlw.writeEndDocument();
-		xmlw.flush();  
-		xmlw.close();
-		} catch (Exception e) {
-			System.out.println("Errore nell'inizializzazione del writer:");
-			System.out.println(e.getMessage());
-			
-		}
-		//Questo qua sotto è per rendere l'xml leggibile
-		
-		/*DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setValidating(false);
-        DocumentBuilder db = dbf.newDocumentBuilder();
-         
-        Document doc = db.parse(new FileInputStream(new File("CodiceFiscale/src/XML/codiciPersone.xml")));
-        Transformer tf = TransformerFactory.newInstance().newTransformer();
-        tf.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-        tf.setOutputProperty(OutputKeys.INDENT, "yes");
-        Writer out = new StringWriter();
-        tf.transform(new DOMSource(doc), new StreamResult(out));
-        File file = new File ("CodiceFiscale/src/XML/codiciPersone.xml");
-		PrintStream stream = new PrintStream(file);
-        System.setOut(stream);
-        System.out.println(out.toString());*/
-		
-	}
 	
-	public static boolean codiceInvalido(String codiceFiscale) { //Controlla se un codice fiscale è invalido, e se si, retrun true
-		
-		String vocaliGlobali = "AEIOU";
+	public static boolean codiceInvalido(String codiceFiscale) { //Controlla se un codice fiscale è invalido, e se si, return true
 		String mesi = "ABCDEHLMPRST";
 		//Controllo validità generale
+		
 		if (codiceFiscale.length()!=16){
 			return true;
 		}
-		for (int i=0; i<16; i++) {
-			if (i==6 ||i==7 || i==9 || i==10 || i==12 ||i==13 ||i==14) {
-				if (codiceFiscale.charAt(i)<48 || codiceFiscale.charAt(i)>57) {
+		
+		//Controllo caratteri
+		for (int i=0; i<codiceFiscale.length(); i++) {
+			if (i==6 ||i==7 || i==9 || i==10 || i==12 ||i==13 ||i==14) { //Controllo posizione numeri
+				if (codiceFiscale.charAt(i)<48 || codiceFiscale.charAt(i)>57) //Controllo se il numero è un numero
 					return true;
-					}
-				else
-					if (codiceFiscale.charAt(i)<65 || codiceFiscale.charAt(i)>90)
-						return true;
 					
+				}
+			else //Se non è un numero è una lettera
+				if (codiceFiscale.charAt(i)<65 || codiceFiscale.charAt(i)>90) //Controllo se la lettera è una lettera 
+					return true;
 			}
-			
-		}
 		
 		//Controllo validità mese
-		if (!mesi.contains(String.valueOf(codiceFiscale.charAt(8))))
+		if (!mesi.contains(String.valueOf(codiceFiscale.charAt(8)))) //Controllo se la lettera del mese sia giusta
 			return true;
-		
-		
 		
 		//Controllo validità giorno
 		
-		int giorno = ((codiceFiscale.charAt(9)-48)*10 +(codiceFiscale.charAt(10)-48));
+		int giorno = ((codiceFiscale.charAt(9)-48)*10 +(codiceFiscale.charAt(10)-48)); //Prendo il giorno
 		
-		if (giorno>31)
+		if (giorno>31) //Controllo se maschio o femmina
 			giorno = giorno-40;
 		
-		if (giorno<1 || giorno >31)
+		if (giorno<1 || giorno >31) //Controllo se il giorno è valido
 			return true;
 		
-		//Qua bisogna verificare se il giorno può esistere all'interno del mese xyz
+		int anno= ((codiceFiscale.charAt(6)-48)*10 +(codiceFiscale.charAt(7)-48)); //Prendo l'anno
 		
+		if (controlGiorno(anno, codiceFiscale.charAt(8), giorno)) //Verifico se il giorno esiste nel mese
+			return true;
 		
+		//Controllo se il Cin è corretto
+		if (codiceFiscale.charAt(15)!=creazioneCin(codiceFiscale))
+			return true;
 		
-		//Controllo validità Cognome	
-		for (int i=0; i<2; i++) {
-			if (vocaliGlobali.contains(String.valueOf(codiceFiscale.charAt(i)))) {
-				for (int j=i+1; j<3; j++) {
-					if (!vocaliGlobali.contains(String.valueOf(codiceFiscale.charAt(j)))) {
-						if('X'==codiceFiscale.charAt(j)) {
-							if (j==1 && 'X'!=codiceFiscale.charAt(j+1)) {
-								return true;
-							}
-						}
-						else
-							return true;
-					}
-				}
-			}
+		//Controllo validità Cognome
+		String cognome = "" +codiceFiscale.charAt(0) + codiceFiscale.charAt(1) + codiceFiscale.charAt(2); 
+		if (controlNomi(cognome))
+			return true;
 			
-		}
 		
 		//Controllo validità Nome
+		String nome = "" +codiceFiscale.charAt(3) + codiceFiscale.charAt(4) + codiceFiscale.charAt(5);
 		
-		for (int i=3; i<5; i++) {
-			if (vocaliGlobali.contains(String.valueOf(codiceFiscale.charAt(i)))) {
-				for (int j=i+1; j<6; j++) {
-					if (!vocaliGlobali.contains(String.valueOf(codiceFiscale.charAt(j)))) {
-						if('X'==codiceFiscale.charAt(j)) {
-							if (j==1 && 'X'!=codiceFiscale.charAt(j+1)) {
+		if (controlNomi(nome))
+			return true;
+		
+		return false; //Se non ci sono problemi, return false
+		
+	}
+	
+
+	public static boolean controlNomi(String nome){ //Metodo adibito a controllare se il nome/cognome (di un codice fiscale) è valido, return false se lo è
+		
+		for (int i=0; i<2; i++) {
+			if (vocaliGlobali.contains(String.valueOf(nome.charAt(i)))) {
+				for (int j=i+1; j<3; j++) {
+					if (!vocaliGlobali.contains(String.valueOf(nome.charAt(j)))) {
+						if('X'==nome.charAt(j)) {
+							if (j==1 && 'X'!=nome.charAt(j+1)) {
 								return true;
 							}
 						}
@@ -509,8 +330,26 @@ public class calcolatore {
 			}
 			
 		}
+		return false;
+		}
+	
+	
+	public static boolean controlGiorno(int anno, char mese, int giorno) {//Metodo adibito a verificare se un particolare giorno esiste, se esiste return false
+		if (mese=='A' || mese=='C' || mese=='E' || mese=='L' || mese=='M' || mese=='R' || mese=='T') {
+			if (giorno>31)
+				return true;
+		}
 		
+		if (mese=='D' || mese=='H' || mese=='P' || mese=='S') {
+			if (giorno>30)
+				return true;
+		}
 		
+		if (mese=='B') {
+			if (giorno>28)
+				if (anno%4!=0)
+				return true;
+		}
 		
 		return false;
 		

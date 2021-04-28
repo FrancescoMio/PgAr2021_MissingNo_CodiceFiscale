@@ -16,11 +16,11 @@ public class CodiceFiscaleMain {
 	static ArrayList<Persona> persone = new ArrayList<Persona>();
 	
 	public static void main(String[] args) throws XMLStreamException /*, ParserConfigurationException, TransformerFactoryConfigurationError, SAXException, IOException, TransformerException*/ {
-		calcolatore.creaPersone(persone);
+		inputOutput.creaPersone(persone);
 		for(int i = 0; i < 100; i++) {
 			System.out.println(persone.get(i).toString());
 	}
-		calcolatore.scritturaXML(persone);
+		inputOutput.scritturaXML(persone);
 }
 }
 
