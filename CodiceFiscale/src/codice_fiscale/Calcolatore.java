@@ -94,6 +94,8 @@ public class Calcolatore {//Questa classe di occupa di generare e verificare cod
 					}
 				}
 		//Anno di nascita
+		if ((persone.getAnnoNascita()==-1)) 
+			return "ERROR";
 		String anno= String.valueOf((persone.getAnnoNascita()%100));//Prendo solo le ultime due cifre dell'anno
 		if (anno.length()==1) { //Se l'anno ha dimensione 1, aggiungi uno zero prima
 			anno = "0"+anno;
@@ -151,6 +153,9 @@ public class Calcolatore {//Questa classe di occupa di generare e verificare cod
 		
 		if(controlGiorno(persone.getAnnoNascita(), codiceFiscale.charAt(8), persone.getGiornoNascita())) 
 			return "ERROR";
+		
+		if (persone.getSesso()=='N')
+			return "ERROR";
 				
 		if (persone.getSesso()=='F') //Se sei una donna, aggiungi 40 al giorno
 			codiceFiscale=codiceFiscale.concat(String.valueOf(persone.getGiornoNascita()+40));
@@ -163,9 +168,8 @@ public class Calcolatore {//Questa classe di occupa di generare e verificare cod
 		}
 		//Comune di nascita
 		
-		if (persone.getComuneCodice()=="")
+		if (persone.getComuneCodice().equals("N"))
 			return "ERROR";
-		
 		codiceFiscale= codiceFiscale.concat(persone.getComuneCodice());
 		//Carattere di Controllo
 		cin = creazioneCin(codiceFiscale);
@@ -189,22 +193,22 @@ public class Calcolatore {//Questa classe di occupa di generare e verificare cod
 		for(int i = 0; i < charPari.size(); i++) {
 			int ascii = charPari.get(i);
 			if(ascii < 65) 
-				somma += ascii - 48;
+				somma += ascii - '0';
 			else 
-				somma += ascii - 65;
+				somma += ascii - 'A';
 		}
 		//String lettereDispari[] = {"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"};
 		int dispari[] = {1,0,5,7,9,13,15,17,19,21,2,4,18,20,11,3,6,8,12,14,16,10,22,25,24,23};
 		int [] dispari2 = {1,0,5,7,9,13,15,17,19,21};
 		for(int i = 0; i < charDispari.size(); i++) {
 			int ascii = charDispari.get(i);
-			if(ascii < 65) {
-				int numero = ascii - 48;
+			if(ascii < 'A') {
+				int numero = ascii - '0';
 				int valore = dispari2[numero];
 				somma += valore;
 			}
 			else {
-				int numero = ascii - 65;
+				int numero = ascii - 'A';
 				int valore = dispari[numero];
 				somma += valore;
 			}

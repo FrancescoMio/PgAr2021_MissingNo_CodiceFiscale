@@ -44,6 +44,7 @@ public class InputOutput {//Questa classe si occupa di leggere e/o scrivere cose
 			 case XMLStreamConstants.END_ELEMENT: // 
 				 if(xmlr.getLocalName().equals("persona")) {
 				 Persona persona = new Persona(nome, cognome, comuneNascita, sesso, giornoNascita, meseNascita, annoNascita);
+				 annoNascita=0;
 				 persona.setComuneCodice(comuneCodice);
 				 persona.setCodiceFiscale(Calcolatore.generazioneCodiceFiscale(persona));
 				 if (!esisteCodice(persona))
@@ -62,17 +63,46 @@ public class InputOutput {//Questa classe si occupa di leggere e/o scrivere cose
 					 else if(elementName.equals("cognome")) {
 						 cognome = xmlr.getText().toUpperCase();
 					 }
-					 else if(elementName.equals("sesso")) {
-						 sesso = xmlr.getText().toUpperCase().charAt(0);
+					 else if(elementName.equals("sesso")) {//Vari controlli per verificare il sesso
+						 
+						 if (xmlr.getText()==null )
+							 sesso = 'N';
+						 if (xmlr.getText().equals("M") || xmlr.getText().equals("F"))
+							 sesso = xmlr.getText().toUpperCase().charAt(0);
+						 else
+							 sesso = 'N';
 					 }
 					 else if(elementName.equals("comune_nascita")) {
 						 comuneNascita=xmlr.getText();
 						 comuneCodice=trovaComune(xmlr.getText());
 					 }
 					 else {
+						 
+						 if(xmlr.getText().equals("")) //Vari controlli per verificare che la data sia giusta
+							 annoNascita=-1;
+						 
+						 if (xmlr.getText().length()==10) {	 
+							 for (int i=0; i<10; i++) {
+							 
+								 if (i==4 || i==7) {
+									 if (xmlr.getText().charAt(i)!='-')
+										 annoNascita=-1;
+									 i++;
+								 }
+							 
+								 if (xmlr.getText().charAt(i)<'0' || xmlr.getText().charAt(i)>'9') 
+									 annoNascita=-1;
+								 }
+						 }
+						 
+						 if (xmlr.getText().length()!=10)
+							 annoNascita=-1;
+						 
+						 if (annoNascita!=-1) {
 						 giornoNascita = Calcolatore.calcolaGiornoNascita(xmlr.getText());
 						 meseNascita = Calcolatore.calcolaMeseNascita(xmlr.getText());
 						 annoNascita = Calcolatore.calcolaAnnoNascita(xmlr.getText());
+						 }
 					 }
 				 }
 				 break;
@@ -102,7 +132,7 @@ public class InputOutput {//Questa classe si occupa di leggere e/o scrivere cose
 			}
 			xmlr.next();
 		}
-		return "";
+		return "N";
 	}
 	
 	
@@ -127,35 +157,27 @@ public class InputOutput {//Questa classe si occupa di leggere e/o scrivere cose
 		if (persone.getCodiceFiscale().equals("ERROR")) {
 			return false;
 		}
-		XMLStreamReader xmlr = creaLettore("CodiceFiscale/src/XML/codiciFiscali.xml");
-		while (xmlr.hasNext()) { 
-			 switch (xmlr.getEventType()) {
-			 case XMLStreamConstants.CHARACTERS:
-			 		if (xmlr.getText().trim().length() > 0){
-			 			if(xmlr.getText().equals(persone.getCodiceFiscale())) {
-			 				return true;
-					 	}
-			 		}
-			 break;
-			 }
-			 xmlr.next();
-			 }
+		ArrayList<String> codici = getCodici();
+		for (int i = 0; i<codici.size();i++) {
+			if (persone.getCodiceFiscale().equals(codici.get(i)))
+				return true;
+		}
 		return false;
 	}
 	
 	public static ArrayList<String> getCodici() throws XMLStreamException{ //Crea un arraylist di tutti i codici fiscali presenti in codiciFiscali.xml
-		ArrayList<String> codici2 = new ArrayList<String>();
+		ArrayList<String> codici = new ArrayList<String>();
 		XMLStreamReader xmlr = creaLettore("CodiceFiscale/src/XML/codiciFiscali.xml");
 		while (xmlr.hasNext()) { 
 			 switch (xmlr.getEventType()) {
 			 case XMLStreamConstants.CHARACTERS:
 				 if (xmlr.getText().trim().length() > 0)
-				 codici2.add(xmlr.getText());
+				 codici.add(xmlr.getText());
 				 break;
 					 	}
 			 xmlr.next();
 			 		}
-		return codici2;
+		return codici;
 		}
 			 
 	
