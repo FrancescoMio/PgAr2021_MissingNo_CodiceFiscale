@@ -11,15 +11,24 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-public class InputOutput {//Questa classe si occupa di leggere e/o scrivere cose da file
-	
+
+/**
+ * Questa classe si occupa di leggere e/o scrivere dati di una persona da/su file
+ *
+ */
+public class InputOutput {//
 	
 	static String elementName;
 	static String nome , cognome, comuneNascita, dataNascita, comuneCodice;
 	static char sesso;
 	static int giornoNascita = 0, meseNascita = 0,  annoNascita = 0;
 	
-	public static XMLStreamReader creaLettore(String filename) { //crea un Lettore xmlr
+	/**
+	 * Metodo utilizzato per la creazione di un lettore al fine di leggere i vari file xml
+	 * @param filename
+	 * @return
+	 */
+	public static XMLStreamReader creaLettore(String filename) {
 		XMLInputFactory xmlif = null;
 		XMLStreamReader xmlr = null;
 		try {
@@ -32,8 +41,12 @@ public class InputOutput {//Questa classe si occupa di leggere e/o scrivere cose
 		}
 		return xmlr;
 	}
-	
-	public static void creaPersone(ArrayList<Persona> persone) throws XMLStreamException { //Questo metodo crea Persone e le mette nell'arraylist persone
+	/**
+	 * Questo metodo crea le istanze delle Persone ricavando i dati dal file inputPersone.xml e le mette nell'arraylist persone
+	 * @param persone
+	 * @throws XMLStreamException
+	 */
+	public static void creaPersone(ArrayList<Persona> persone) throws XMLStreamException {
 		
 		XMLStreamReader xmlr = creaLettore("CodiceFiscale/src/XML/inputPersone.xml");
 		while (xmlr.hasNext()) { // continua a leggere finché ha eventi a disposizione
@@ -110,8 +123,13 @@ public class InputOutput {//Questa classe si occupa di leggere e/o scrivere cose
 			 xmlr.next();
 		}
 	}
-	
-	private static String trovaComune(String comuneNascita ) throws XMLStreamException { //trova codice relativo al comune
+	/**
+	 * Metodo per la ricerca del codice attribuito ad ogni comune dal file comuni.xml
+	 * @param comuneNascita
+	 * @return
+	 * @throws XMLStreamException
+	 */
+	private static String trovaComune(String comuneNascita ) throws XMLStreamException {
 		XMLStreamReader xmlr = creaLettore("CodiceFiscale/src/XML/comuni.xml");
 		boolean check=false;
 		while (xmlr.hasNext()) { 
@@ -135,8 +153,13 @@ public class InputOutput {//Questa classe si occupa di leggere e/o scrivere cose
 		return "N";
 	}
 	
-	
-	public static boolean verificaComune(String comune) throws XMLStreamException {//Verifica la presenza di un comune all'interno di comuni.xml, ritorna true se si
+	/**
+	 * Verifica la presenza di un comune all'interno di comuni.xml, ritorna true se si
+	 * @param comune
+	 * @return
+	 * @throws XMLStreamException
+	 */
+	public static boolean verificaComune(String comune) throws XMLStreamException {
 		XMLStreamReader xmlr = creaLettore("CodiceFiscale/src/XML/comuni.xml");
 		while (xmlr.hasNext()) { 
 			switch (xmlr.getEventType()) {
@@ -153,7 +176,13 @@ public class InputOutput {//Questa classe si occupa di leggere e/o scrivere cose
 		return false;
 	}
 	
-	public static boolean esisteCodice(Persona persone) throws XMLStreamException { //Questo metodo controlla che il codice fiscale di una persona sia presente in codiciFiscali.xml
+	/**
+	 * Questo metodo controlla che il codice fiscale di una persona sia presente in codiciFiscali.xml
+	 * @param persone
+	 * @return
+	 * @throws XMLStreamException
+	 */
+	public static boolean esisteCodice(Persona persone) throws XMLStreamException {
 		if (persone.getCodiceFiscale().equals("ERROR")) {
 			return false;
 		}
@@ -164,8 +193,12 @@ public class InputOutput {//Questa classe si occupa di leggere e/o scrivere cose
 		}
 		return false;
 	}
-	
-	public static ArrayList<String> getCodici() throws XMLStreamException{ //Crea un arraylist di tutti i codici fiscali presenti in codiciFiscali.xml
+	/**
+	 * Crea un arraylist di tutti i codici fiscali presenti in codiciFiscali.xml
+	 * @return
+	 * @throws XMLStreamException
+	 */
+	public static ArrayList<String> getCodici() throws XMLStreamException{
 		ArrayList<String> codici = new ArrayList<String>();
 		XMLStreamReader xmlr = creaLettore("CodiceFiscale/src/XML/codiciFiscali.xml");
 		while (xmlr.hasNext()) { 
@@ -180,11 +213,13 @@ public class InputOutput {//Questa classe si occupa di leggere e/o scrivere cose
 		return codici;
 		}
 			 
-	
-		
-	//Metodo che crea CodiciPersone.xml
-	
-	public static void scritturaXML(ArrayList<Persona> persone) throws XMLStreamException /*ParserConfigurationException, TransformerFactoryConfigurationError, SAXException, IOException, TransformerException*/ {
+	/**
+	 * Metodo che crea  il file CodiciPersone.xml
+	 * @param persone
+	 * @return
+	 * @throws XMLStreamException
+	 */
+	public static boolean scritturaXML(ArrayList<Persona> persone) throws XMLStreamException /*ParserConfigurationException, TransformerFactoryConfigurationError, SAXException, IOException, TransformerException*/ {
 		ArrayList<String> codici =InputOutput.getCodici(); //Insieme dei codici Fiscali di codiciFiscali.xml
 		ArrayList<String> invalidi = new ArrayList<String>();
 		ArrayList<String> spaiati= new ArrayList<String>();
@@ -271,10 +306,11 @@ public class InputOutput {//Questa classe si occupa di leggere e/o scrivere cose
 		xmlw.writeEndDocument();//Fine documento
 		xmlw.flush();  
 		xmlw.close();
+		return true;
 		} catch (Exception e) {
 			System.out.println("Errore nell'inizializzazione del writer:");
 			System.out.println(e.getMessage());
-			
+			return false;
 		}
 		//Questo qua sotto è per rendere l'xml leggibile
 		
@@ -292,8 +328,5 @@ public class InputOutput {//Questa classe si occupa di leggere e/o scrivere cose
 		PrintStream stream = new PrintStream(file);
         System.setOut(stream);
         System.out.println(out.toString());*/
-		
 	}
-	
-
 }

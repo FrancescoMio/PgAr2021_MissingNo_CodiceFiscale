@@ -1,6 +1,10 @@
 package codice_fiscale;
 
-public class Persona {//Beh, persona
+/**
+ * Classe rappresentante una generica persona con i relativi dati
+ *
+ */
+public class Persona {
 	private String nome;
 	private String cognome;
 	private String comuneNascita;
@@ -11,7 +15,10 @@ public class Persona {//Beh, persona
 	private int annoNascita;
 	private String codiceFiscale;
 	private String assenza;
+	
 	/**
+	 * Costruttore della classe Persona
+	 * 
 	 * @param nome
 	 * @param cognome
 	 * @param comuneNascita
@@ -29,119 +36,159 @@ public class Persona {//Beh, persona
 		this.meseNascita = meseNascita;
 		this.annoNascita = annoNascita;
 	}
+	/**
+	 * Metodo che ritorna l'attributo codiceFiscale di una persona
+	 * @return
+	 */
 	public String getCodiceFiscale() {
 		return codiceFiscale;
 	}
-	
+	/**
+	 * Metodo che setta l'attributo codiceFiscale di una persona
+	 * @param codice
+	 */
 	public void setCodiceFiscale(String codice) {
 		codiceFiscale = codice;
 	}
 	
 	/**
-	 * @return the nome
+	 * Metodo che ritorna l'attributo nome di una persona
+	 * @return
 	 */
 	public String getNome() {
 		return nome;
 	}
 	/**
-	 * @param nome the nome to set
+	 * Metodo che setta l'attributo nome di una persona
+	 * @param nome
 	 */
 	public void setNome(String nome) {
 		this.nome = nome;
 	}
 	/**
-	 * @return the cognome
+	 * Metodo che ritorna l'attributo cognome di una persona
+	 * @return
 	 */
 	public String getCognome() {
 		return cognome;
 	}
 	/**
-	 * @param cognome the cognome to set
+	 * Metodo che setta l'attributo cognome di una persona
+	 * @return
 	 */
 	public void setCognome(String cognome) {
 		this.cognome = cognome;
 	}
 	/**
-	 * @return the comuneNascita
+	 * Metodo che ritorna l'attributo comuneNascita di una persona
+	 * @return
 	 */
 	public String getComuneNascita() {
 		return comuneNascita;
 	}
 	/**
-	 * @param comuneNascita the comuneNascita to set
+	 * Metodo che setta l'attributo comuneNascita di una persona
+	 * @return
 	 */
 	public void setComuneNascita(String comuneNascita) {
 		this.comuneNascita = comuneNascita;
 	}
+	/**
+	 * Metodo che ritorna l'attributo comuneCodice di una persona
+	 * @return
+	 */
 	public String getComuneCodice() {
 		return comuneCodice;
 	}
 	
+	/**
+	 * Metodo che setta l'attributo comuneCodice di una persona
+	 * @param comuneCodice
+	 */
 	public void setComuneCodice(String comuneCodice) {
 		this.comuneCodice = comuneCodice;
 	}
 	/**
-	 * @return the sesso
+	 * Metodo che ritorna l'attributo sesso di una persona
+	 * @return
 	 */
 	public char getSesso() {
 		return sesso;
 	}
 	/**
-	 * @param sesso the sesso to set
+	 * Metodo che setta l'attributo sesso di una persona
+	 * @param
 	 */
 	public void setSesso(char sesso) {
 		this.sesso = sesso;
 	}
 	/**
-	 * @return the giornoNascita
+	 * Metodo che ritorna l'attributo giornoNascita di una persona
+	 * @param
 	 */
 	public int getGiornoNascita() {
 		return giornoNascita;
 	}
 	/**
-	 * @param giornoNascita the giornoNascita to set
+	 * Metodo che setta l'attributo giornoNascita di una persona
+	 * @param
 	 */
 	public void setGiornoNascita(int giornoNascita) {
 		this.giornoNascita = giornoNascita;
 	}
 	/**
-	 * @return the meseNascita
+	 * Metodo che ritorna l'attributo meseNascita di una persona
+	 * @param
 	 */
 	public int getMeseNascita() {
 		return meseNascita;
 	}
 	/**
-	 * @param meseNascita the meseNascita to set
+	 * Metodo che setta l'attributo meseNascita di una persona
+	 * @param
 	 */
 	public void setMeseNascita(int meseNascita) {
 		this.meseNascita = meseNascita;
 	}
 	/**
-	 * @return the annoNascita
+	 * Metodo che ritorna l'attributo annoNascita di una persona
+	 * @param
 	 */
 	public int getAnnoNascita() {
 		return annoNascita;
 	}
 	/**
-	 * @param annoNascita the annoNascita to set
+	 * Metodo che setta l'attributo annoNascita di una persona
+	 * @param
 	 */
 	public void setAnnoNascita(int annoNascita) {
 		this.annoNascita = annoNascita;
 	}
-	
+	/**
+	 * Metodo che ritorna l'attributo assenza di una persona
+	 * @param
+	 */
 	public String getAssenza(){
 		return assenza;
 	}
-	
+	/**
+	 * Metodo che setta l'attributo assenza di una persona
+	 * @param
+	 */
 	public void setAssenza(String assenza) {
 		this.assenza=assenza;
 	}
-	
+	/**
+	 * Metodo che ritorna la stringa relativa alla data di nascita della persona
+	 * @param
+	 */
 	public String data() {
 		return getAnnoNascita()+"-"+getMeseNascita()+"-"+getGiornoNascita();
 	}
 	
-
+	/**
+	 * Metodo toString() che stampa le informazioni relative ad una persona
+	 */
 	@Override
 	public String toString() {
 		return "Persona [nome = " + nome + ", cognome = " + cognome + ", comuneNascita = " + comuneNascita + ", sesso = "

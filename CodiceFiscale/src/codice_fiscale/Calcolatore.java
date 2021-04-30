@@ -4,31 +4,53 @@ import java.util.ArrayList;
 
 import javax.xml.stream.XMLStreamException;
 
-public class Calcolatore {//Questa classe di occupa di generare e verificare codici fiscali
+/**
+ * Questa classe di occupa di generare e verificare codici fiscali
+ * 
+ */
+public class Calcolatore {
+	
 	static String vocaliGlobali = "AEIOU";
 	static String consonantiGlobali="BCDFGHJKLMNPQRSTVWXYZ";
 	
+	/**
+	 * Metodo che ritorna il giorno di nascita di una persona a partire dalla data iniziale
+	 * @param dataNascita
+	 * @return
+	 */
 	public static int calcolaGiornoNascita(String dataNascita) {
 		String[] parts = dataNascita.split("-");
 		String giorno = parts[2];
 		int giornoNascita = Integer.parseInt(giorno);
 		return giornoNascita;
 	}
-	
+	/**
+	 * Metodo che ritorna il mese di nascita di una persona a partire dalla data iniziale
+	 * @param dataNascita
+	 * @return
+	 */
 	public static int calcolaMeseNascita(String dataNascita) {
 		String[] parts = dataNascita.split("-");
 		String mese = parts[1];
 		int meseNascita = Integer.parseInt(mese);
 		return meseNascita;
 	}
-	
+	/**
+	 * Metodo che ritorna l'anno di nascita di una persona a partire dalla data iniziale
+	 * @param dataNascita
+	 * @return
+	 */
 	public static int calcolaAnnoNascita(String dataNascita) {
 		String[] parts = dataNascita.split("-");
 		String anno = parts[0];
 		int annoNascita = Integer.parseInt(anno);
 		return annoNascita;
 	}
-	
+	/**
+	 * Metodo che calcola il codice fiscale di una persona
+	 * @param persone
+	 * @return
+	 */
 	public static String generazioneCodiceFiscale(Persona persone) {//Metodo adibito alla creazione del codicice fiscale
 		
 		String codiceFiscale= "";
@@ -177,8 +199,12 @@ public class Calcolatore {//Questa classe di occupa di generare e verificare cod
 		return codiceFiscale;
 	}
 	
-
-	public static char creazioneCin(String codiceFiscale) { //Creazione carattere di controllo
+	/**
+	 * Metodo che calcola il codice di controllo del codice fiscale di una persona
+	 * @param codiceFiscale
+	 * @return
+	 */
+	public static char creazioneCin(String codiceFiscale) {
 		if (codiceFiscale.length()==16)
 				codiceFiscale= codiceFiscale.substring(0, codiceFiscale.length() - 1);
 		ArrayList<Character> charPari = new ArrayList<Character>();
@@ -218,8 +244,13 @@ public class Calcolatore {//Questa classe di occupa di generare e verificare cod
 		return ((char)ascii);
 	}
 	
-	
-	public static boolean codiceInvalido(String codiceFiscale) throws XMLStreamException { //Controlla se un codice fiscale è invalido, e se si, return true
+	/**
+	 * Controlla se un codice fiscale è invalido, e se si, return true
+	 * @param codiceFiscale
+	 * @return
+	 * @throws XMLStreamException
+	 */
+	public static boolean codiceInvalido(String codiceFiscale) throws XMLStreamException {
 		String mesi = "ABCDEHLMPRST";
 		//Controllo validità generale
 		
@@ -288,8 +319,12 @@ public class Calcolatore {//Questa classe di occupa di generare e verificare cod
 		
 	}
 	
-
-	public static boolean controlNomi(String nome){ //Metodo adibito a controllare se il nome/cognome (di un codice fiscale) è valido, return false se lo è
+	/**
+	 * Metodo adibito a controllare se il nome/cognome (di un codice fiscale) è valido, return false se lo è
+	 * @param nome
+	 * @return
+	 */
+	public static boolean controlNomi(String nome){ //
 		
 		for (int i=0; i<2; i++) {
 			if (vocaliGlobali.contains(String.valueOf(nome.charAt(i)))) {
@@ -310,8 +345,14 @@ public class Calcolatore {//Questa classe di occupa di generare e verificare cod
 		return false;
 		}
 	
-	
-	public static boolean controlGiorno(int anno, char mese, int giorno) {//Metodo adibito a verificare se un particolare giorno esiste, se esiste return false
+	/**
+	 * Metodo adibito a verificare se un particolare giorno esiste, se esiste return false
+	 * @param anno
+	 * @param mese
+	 * @param giorno
+	 * @return
+	 */
+	public static boolean controlGiorno(int anno, char mese, int giorno) {//
 		if (mese=='A' || mese=='C' || mese=='E' || mese=='L' || mese=='M' || mese=='R' || mese=='T') {
 			if (giorno>31)
 				return true;
